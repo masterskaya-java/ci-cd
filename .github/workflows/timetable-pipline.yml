@@ -1,0 +1,33 @@
+name: Timetable CI/CD
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      # Шаг необходимый, чтобы следующие шаги нашего workflow были выполнимы
+      - name: Repository checkout
+        uses: actions/checkout@v4
+      # Кеширование Maven зависимостей
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      # Установка JDK 21, для компиляции
+      - name: Java Setup
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+      # Проверка кода на соответствие google format
+      - name: Check code formatting
+        run: mvn spotless:check
+      # Выполнение unit тестов и проверок после сборки приложения
+      - name: Trying to build app
+        run: mvn clean verify --no-transfer-progress
