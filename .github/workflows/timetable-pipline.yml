@@ -8,7 +8,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      # Шаг необходимый, чтобы следующие шаги нашего workflow были выполнимы
+      # Шаг клонирует репозиторий внутрь VM GitHub actions и делает чекаут нужной ветки
       - name: Repository checkout
         uses: actions/checkout@v4
       # Кеширование Maven зависимостей
