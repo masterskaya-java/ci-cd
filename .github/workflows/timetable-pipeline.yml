@@ -1,17 +1,17 @@
-name: Timetable CI/CD
+name: Timetable CI/CD Pipelene
 
 on:
   workflow_call:
-  workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      # Шаг клонирует репозиторий внутрь VM GitHub actions и делает чекаут нужной ветки
+      # Клонирование репозитория внутрь VM GitHub Actions и checkout нужной ветки
       - name: Repository checkout
         uses: actions/checkout@v4
-      # Кеширование Maven зависимостей
+      
+      # Кеширование (для последующих сборок) Maven зависимостей
       - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
@@ -19,15 +19,22 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      # Установка JDK 21, для компиляции
-      - name: Java Setup
+      
+      # Установка JDK 21 для компиляции и запуска приложения в следующих шагах, а также использования mvn 
+      - name: Java setup
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: '21'
-      # Проверка кода на соответствие google format
-      - name: Check code formatting
+      
+      # Проверка кода на соответствие google-java-format
+      - name: Google Java Format validation
         run: mvn spotless:check
-      # Выполнение unit тестов и проверок после сборки приложения
-      - name: Trying to build app
+      
+      # Проверка кода на соответствие правилам Checkstyle
+      - name: Checkstyle validation
+        run: mvn checkstyle:check
+      
+      # Сборка проекта и запуск unit тестов
+      - name: Build and run tests
         run: mvn clean verify --no-transfer-progress
