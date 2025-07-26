@@ -1,0 +1,14 @@
+services:
+  timetable-db:
+    image: postgres:16.1
+    container_name: prod-db
+    volumes:
+      - yndxt-pgdata-prod:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${YNDXT_APP_DB_SCHEMA_PROD}
+      - POSTGRES_USER=${YNDXT_APP_DB_USERNAME_PROD}
+      - POSTGRES_PASSWORD=${YNDXT_APP_DB_PASSWORD_PROD}
+volumes:
+  yndxt-pgdata-prod:

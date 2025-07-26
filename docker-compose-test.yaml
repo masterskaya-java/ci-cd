@@ -1,0 +1,14 @@
+services:
+  timetable-db-test:
+    image: postgres:16.1
+    container_name: test-db
+    volumes:
+      - yndxt-pgdata-test:/var/lib/postgresql/data
+    ports:
+      - "5442:5432"
+    environment:
+      - POSTGRES_DB=${YNDXT_APP_DB_SCHEMA_TEST}
+      - POSTGRES_USER=${YNDXT_APP_DB_USERNAME_TEST}
+      - POSTGRES_PASSWORD=${YNDXT_APP_DB_PASSWORD_TEST}
+volumes:
+  yndxt-pgdata-test:
