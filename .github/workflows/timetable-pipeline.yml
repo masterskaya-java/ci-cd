@@ -2,6 +2,13 @@ name: Timetable CI/CD Pipelene
 
 on:
   workflow_call:
+    inputs:
+      sonar-token:
+        required: true
+        type: string
+      sonar-url:
+        required: true
+        type: string
 
 jobs:
   build-and-test:
@@ -38,13 +45,16 @@ jobs:
       # Сборка проекта и запуск unit тестов
       - name: Build and run tests
         run: mvn clean verify --no-transfer-progress
+      
+      # Вывод переменных сонара для проверки
+      - name: Debug SONAR vars
+        run: |
+          echo "SONAR_HOST_URL=${{ inputs.sonar-url }}"
+          echo "SONAR_TOKEN=${{ inputs.sonar-token }}"
 
-      # Проверка кода сонаром
+      # Проверка кода SonarQube
       - name: SonarQube scan
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: mvn sonar:sonar \
           -Dsonar.projectKey=YNDXT \
-          -Dsonar.host.url=$SONAR_HOST_URL \
-          -Dsonar.login=$SONAR_TOKEN
+          -Dsonar.host.url=${{ inputs.sonar-url }} \
+          -Dsonar.login=${{ inputs.sonar-token }}
