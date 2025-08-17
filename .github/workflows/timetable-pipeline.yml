@@ -2,6 +2,11 @@ name: Timetable CI/CD Pipeline
 
 on:
   workflow_call:
+    secrets:
+      SONAR_TOKEN:
+        required: true
+      SONAR_HOST_URL:
+        required: true
 
 jobs:
   build-and-test:
@@ -10,6 +15,14 @@ jobs:
       # Клонирование репозитория внутрь VM GitHub Actions и checkout нужной ветки
       - name: Repository checkout
         uses: actions/checkout@v4
+
+      - name: Debug SONAR secrets
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          echo "SONAR_HOST_URL=$SONAR_HOST_URL"
+          echo "SONAR_TOKEN=${SONAR_TOKEN:0:4}***"
       
       # Кеширование (для последующих сборок) Maven зависимостей
       - name: Cache Maven dependencies
@@ -44,7 +57,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn sonar:sonar \
-          -Dsonar.projectKey=YNDXT \
-          -Dsonar.host.url=$SONAR_HOST_URL \
-          -Dsonar.login=$SONAR_TOKEN
+        run: mvn sonar:sonar -Dsonar.projectKey=YNDXT -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN
