@@ -1,4 +1,4 @@
-name: Timetable CI/CD Pipelene
+name: Timetable CI/CD Pipeline
 
 on:
   workflow_call:
@@ -38,3 +38,13 @@ jobs:
       # Сборка проекта и запуск unit тестов
       - name: Build and run tests
         run: mvn clean verify --no-transfer-progress
+
+      # Проверка кода сонаром
+      - name: SonarQube scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn sonar:sonar \
+          -Dsonar.projectKey=YNDXT \
+          -Dsonar.host.url=$SONAR_HOST_URL \
+          -Dsonar.login=$SONAR_TOKEN
