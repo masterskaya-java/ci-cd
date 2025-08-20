@@ -58,3 +58,18 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: mvn sonar:sonar -Dsonar.projectKey=YNDXT -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN
+
+      # Проверка результата Quality Gate
+      - name: Verify SonarQube Quality Gate
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          STATUS=$(curl -s -u $SONAR_TOKEN: "$SONAR_HOST_URL/api/qualitygates/project_status?projectKey=YNDXT" | jq -r '.projectStatus.status')
+
+          echo "Quality Gate status: $STATUS"
+
+          if [ "$STATUS" != "OK" ]; then
+            echo "Quality Gate не пройден или есть критические issues."
+            exit 1
+          fi
